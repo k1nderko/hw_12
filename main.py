@@ -101,6 +101,19 @@ class AddressBook(UserDict):
             f'{i}: +{", +".join(p.value for p in self.data.get(i).phones)}, birthday {self.data.get(i).birthday}' for i in keys)
 
         yield result
+
+    def save_contacts(self):
+        with open('contacts.bin', 'wb') as file:
+            pickle.dump(self.data, file)
+        print('Address book saved successfully!')
+
+    def load_contacts(self):
+        try:
+            with open('contacts.bin', 'rb') as file:  
+                self.data = pickle.load(file)
+                print('Address book loaded successfully!')
+        except FileNotFoundError:
+            print('You dont have contacts')
     
 
 
@@ -223,27 +236,13 @@ def command_handler(input_com: str):
             return func, args
     return unknown_command, None
 
-def save_contacts():
-    with open('contacts.bin', 'wb') as file:
-        pickle.dump(contacts, file)
-    print('Address book saved successfully!')
-
-def load_contacts():
-    try:
-        with open('contacts.bin', 'rb') as file:
-            global contacts   
-            contacts = pickle.load(file)
-            print('Address book loaded successfully!')
-    except FileNotFoundError:
-        print('You dont have contacts')
-
 def main():
-    load_contacts()
+    contacts.load_contacts()
     while True:
         command = input('>>>')
         EXIT = ['exit', 'goodbye', 'close']
         if command.lower() in EXIT:
-            save_contacts()
+            contacts.save_contacts()
             print('Good bye')
             break
         func, args = command_handler(command)
